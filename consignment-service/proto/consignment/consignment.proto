@@ -1,12 +1,10 @@
-// shippy-service-consignment/proto/consignment/consignment.proto
+// consignment-service/proto/consignment/consignment.proto
 syntax = "proto3";
 
-package consignment;
+package go.micro.srv.consignment;
 
 service ShippingService {
   rpc CreateConsignment(Consignment) returns (Response) {}
-
-  // Created a new method
   rpc GetConsignments(GetRequest) returns (Response) {}
 }
 
@@ -22,16 +20,14 @@ message Container {
   string id = 1;
   string customer_id = 2;
   string origin = 3;
+
   string user_id = 4;
 }
 
-// Created a blank get request
 message GetRequest {}
 
 message Response {
   bool created = 1;
   Consignment consignment = 2;
-
-  // Added a pluralised consignment to our generic response message
   repeated Consignment consignments = 3;
 }
