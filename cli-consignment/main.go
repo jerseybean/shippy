@@ -1,4 +1,3 @@
-// shippy/cli-consignment/main.go
 package main
 
 import (
@@ -10,7 +9,8 @@ import (
 	"context"
 
 	pb "github.com/jerseybean/shippy/consignment-service/proto/consignment"
-	"google.golang.org/grpc"
+
+	micro "github.com/micro/go-micro"
 )
 
 const (
@@ -29,13 +29,10 @@ func parseFile(file string) (*pb.Consignment, error) {
 }
 
 func main() {
-	// Set up a connection to the server.
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("Did not connect: %v", err)
-	}
-	defer conn.Close()
-	client := pb.NewShippingServiceClient(conn)
+	service := micro.NewService(micro.Name("shippy.cli.consignment"))
+	service.Init()
+
+	client := pb.NewShippingServiceClient("shippy.service.consignment", service.Client())
 
 	// Contact the server and print out its response.
 	file := defaultFilename
@@ -51,7 +48,7 @@ func main() {
 
 	r, err := client.CreateConsignment(context.Background(), consignment)
 	if err != nil {
-		log.Fatalf("Could not greet: %v", err)
+		log.Fatalf("Could not create a consignment: %v", err)
 	}
 	log.Printf("Created: %t", r.Created)
 
@@ -59,6 +56,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Could not list consignments: %v", err)
 	}
+
 	for _, v := range getAll.Consignments {
 		log.Println(v)
 	}
